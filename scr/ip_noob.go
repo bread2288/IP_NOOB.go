@@ -84,9 +84,11 @@ func read(filename string) []string {
 	// Открытие файла
 	fike, err := os.Open(filename)
 	if err != nil {
-		color.Red("[!] -> Не найден файл '%s'", filename)
-		color.Red("[!] -> Вам необходимо создать файл '%s'", filename)
-		os.Exit(0)
+		_, err := os.Create(filename)
+		if err != nil {
+			color.Red("[!] -> Не удалось создать новый файл '%s'", filename)
+		}
+		read(filename)
 	}
 	defer fike.Close()
 
@@ -202,6 +204,13 @@ func main() {
 		}
 		hosts = read("hosts") // загрузка IPs
 		ports = read("ports") // загрузка порты
+
+		if len(hosts) == 0 || len(ports) == 0 {
+			color.Yellow("[!] -> Пожалуйста введите необходимые данные в файлы!")
+			color.Yellow("HOSTS - IP-адреса.")
+			color.Yellow("PORTS - порты.")
+			os.Exit(0)
+		}
 
 		color.Green("[+] -> Файлы загружены.")
 		color.Blue("")
